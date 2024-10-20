@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <title>Gestion des Catégories et Produits</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        a, button {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+        a:hover, button:hover {
+            background-color: #45a049;
+        }
+        canvas {
+            margin-top: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .button-container {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gestion des Catégories et Produits</h1>
+
+        <!-- Tableau de Bord (Graphique) -->
+        <h2>Tableau de Bord</h2>
+        <div>
+            <canvas id="statistiquesChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Bouton Télécharger la liste des produits en PDF -->
+        <button id="downloadPdfButton">Télécharger la liste des produits en PDF</button>
+
+        <!-- Boutons pour les opérations sur Catégories et Produits -->
+        <div class="button-container">
+            <div>
+                <h2>Catégories</h2>
+                <a href="ajouter-categorie.html">Ajouter une Catégorie</a>
+                <a href="modifier-categorie.html">Modifier une Catégorie</a>
+                <a href="supprimer-categorie.html">Supprimer une Catégorie</a>
+                <a href="lister-categories.html">Lister les Catégories</a>
+            </div>
+
+            <div>
+                <h2>Produits</h2>
+                <a href="ajouter-produit.html">Ajouter un Produit</a>
+                <a href="modifier-produit.html">Modifier un Produit</a>
+                <a href="supprimer-produit.html">Supprimer un Produit</a>
+                <a href="lister-produits.html">Lister les Produits</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/dashboard');
+                const data = await response.json();
+
+                // Créer le graphique
+                const ctx = document.getElementById('statistiquesChart').getContext('2d');
+                const statistiquesChart = new Chart(ctx, {
+                    type: 'bar', // Type de graphique : barre
+                    data: {
+                        labels: ['Catégories', 'Produits'],
+                        datasets: [{
+                            label: 'Nombre',
+                            data: [data.categories, data.produits],
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.2)', // Couleur pour les catégories
+                                'rgba(255, 99, 132, 0.2)', // Couleur pour les produits
+                            ],
+                            borderColor: [
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(255, 99, 132, 1)',
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Fonction pour télécharger la liste des produits en PDF
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            try {
+                const response = await fetch('/produits');
+                const produits = await response.json();
+
+                let yPos = 10;
+                doc.text('Liste des Produits', 10, yPos);
+                yPos += 10;
+
+                produits.forEach(produit => {
+                    doc.text(`ID: ${produit.id}, Nom: ${produit.nom}, Prix: ${produit.prix}, Catégorie ID: ${produit.categorie_id}`, 10, yPos);
+                    yPos += 10;
+                });
+
+                doc.save('liste-produits.pdf');
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Charger les données du tableau de bord au chargement de la page
+        window.onload = loadDashboard;
+
+        // Ajouter l'événement pour télécharger la liste des produits en PDF
+        document.getElementById('downloadPdfButton').addEventListener('click', downloadPDF);
+    </script>
+</body>
+</html>

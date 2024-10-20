@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Liste des Catégories</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Liste des Catégories</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                </tr>
+            </thead>
+            <tbody id="categoriesTableBody">
+                <!-- Les catégories seront insérées ici -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function fetchCategories() {
+            try {
+                const response = await fetch('/categories');
+                const categories = await response.json();
+                const tableBody = document.getElementById('categoriesTableBody');
+
+                categories.forEach(categorie => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${categorie.id}</td>
+                        <td>${categorie.nom}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Appel de la fonction pour récupérer et afficher les catégories
+        fetchCategories();
+    </script>
+</body>
+</html>

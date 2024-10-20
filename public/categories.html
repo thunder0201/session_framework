@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catégories</title>
+</head>
+<body>
+    <h1>Gestion des Catégories</h1>
+    <form id="categoryForm">
+        <label for="categoryName">Nom de la Catégorie :</label>
+        <input type="text" id="categoryName" required>
+        <button type="submit">Ajouter Catégorie</button>
+    </form>
+
+    <h2>Liste des Catégories</h2>
+    <ul id="categoryList"></ul>
+
+    <script>
+        const categoryForm = document.getElementById('categoryForm');
+        const categoryList = document.getElementById('categoryList');
+
+        // Fonction pour récupérer les catégories
+        async function fetchCategories() {
+            const response = await fetch('http://localhost:3000/categories');
+            const categories = await response.json();
+            categoryList.innerHTML = '';
+            categories.forEach(category => {
+                const li = document.createElement('li');
+                li.textContent = category.nom;
+                categoryList.appendChild(li);
+            });
+        }
+
+        // Ajouter une nouvelle catégorie
+        categoryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const categoryName = document.getElementById('categoryName').value;
+
+            await fetch('http://localhost:3000/categories', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nom: categoryName })
+            });
+
+            categoryForm.reset();
+            fetchCategories();
+        });
+
+        // Charger les catégories au chargement de la page
+        window.onload = fetchCategories;
+    </script>
+</body>
+</html>

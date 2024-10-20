@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Liste des Produits</title>
+    <style>
+        /* Styles pour le tableau */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background-color: #007BFF; /* Couleur bleu */
+            color: white; /* Couleur du texte */
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            border: 1px solid #ddd; /* Bordure des cellules */
+            padding: 10px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* Couleur des lignes paires */
+        }
+
+        tr:hover {
+            background-color: #ddd; /* Couleur au survol */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .select-container {
+            margin-bottom: 20px; /* Espace en bas du select */
+            display: flex; /* Flexbox pour aligner l'étiquette et le select */
+            flex-direction: column; /* Alignement vertical */
+        }
+
+        label {
+            margin-bottom: 5px; /* Espace entre l'étiquette et le select */
+            font-weight: bold; /* Mettre l'étiquette en gras */
+            color: #333; /* Couleur du texte de l'étiquette */
+        }
+
+        select {
+            padding: 10px; /* Espace intérieur */
+            border: 1px solid #ddd; /* Bordure du select */
+            border-radius: 5px; /* Coins arrondis */
+            font-size: 16px; /* Taille de la police */
+            outline: none; /* Enlever le contour par défaut */
+            transition: border-color 0.3s; /* Transition pour le changement de couleur */
+        }
+
+        select:focus {
+            border-color: #007BFF; /* Changer la couleur de la bordure lors du focus */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Liste des Produits</h1>
+        
+        <!-- Menu déroulant pour sélectionner un produit -->
+        <div class="select-container">
+            <label for="produitSelect">Sélectionner un produit :</label>
+            <select id="produitSelect">
+                <option value="">-- Choisissez un produit --</option>
+                <!-- Les options seront insérées ici -->
+            </select>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Prix</th>
+                    <th>ID de la Catégorie</th>
+                </tr>
+            </thead>
+            <tbody id="produitsTableBody">
+                <!-- Les produits seront insérés ici -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function fetchProduits() {
+            try {
+                const response = await fetch('/produits');
+                const produits = await response.json();
+                const tableBody = document.getElementById('produitsTableBody');
+                const produitSelect = document.getElementById('produitSelect');
+
+                // Remplir le tableau et le select
+                produits.forEach(produit => {
+                    // Ajouter les produits au tableau
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${produit.id}</td>
+                        <td>${produit.nom}</td>
+                        <td>${produit.prix}</td>
+                        <td>${produit.categorie_id}</td>
+                    `;
+                    tableBody.appendChild(row);
+
+                    // Ajouter les produits au menu déroulant
+                    const option = document.createElement('option');
+                    option.value = produit.id;
+                    option.textContent = `${produit.nom} (ID: ${produit.id})`;
+                    produitSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Appel de la fonction pour récupérer et afficher les produits
+        fetchProduits();
+    </script>
+</body>
+</html>

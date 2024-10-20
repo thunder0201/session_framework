@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Supprimer Produit</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Supprimer un Produit</h1>
+        <form id="supprimerProduitForm">
+            <label for="produitId">ID du produit :</label>
+            <input type="number" id="produitId" required>
+
+            <button type="submit"><i class="fas fa-trash"></i> Supprimer</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('supprimerProduitForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('produitId').value;
+            try {
+                const response = await fetch(`/produits/${id}`, { method: 'DELETE' });
+                const data = await response.json();
+                alert(data.message || data.error);
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        });
+    </script>
+</body>
+</html>

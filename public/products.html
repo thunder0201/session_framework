@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produits</title>
+</head>
+<body>
+    <h1>Gestion des Produits</h1>
+    <form id="productForm">
+        <label for="productName">Nom du Produit :</label>
+        <input type="text" id="productName" required>
+        <label for="categorySelect">Catégorie :</label>
+        <select id="categorySelect"></select>
+        <button type="submit">Ajouter Produit</button>
+    </form>
+
+    <h2>Liste des Produits</h2>
+    <ul id="productList"></ul>
+
+    <script>
+        const productForm = document.getElementById('productForm');
+        const productList = document.getElementById('productList');
+        const categorySelect = document.getElementById('categorySelect');
+
+        // Fonction pour récupérer les catégories et les produits
+        async function fetchCategories() {
+            const response = await fetch('http://localhost:3000/categories');
+            const categories = await response.json();
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.nom;
+                option.textContent = category.nom;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        async function fetchProducts() {
+            const response = await fetch('http://localhost:3000/products');
+            const products = await response.json();
+            productList.innerHTML = '';
+            products.forEach(product => {
+                const li = document.createElement('li');
+                li.textContent = `${product.nom} - Catégorie: ${product.categorie}`;
+                productList.appendChild(li);
+            });
+        }
+
+        // Ajouter un nouveau produit
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const productName = document.getElementById('productName').value;
+            const categoryName = categorySelect.value;
+
+            await fetch('http://localhost:3000/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nom: productName, categorie: categoryName })
+            });
+
+            productForm.reset();
+            fetchProducts();
+        });
+
+        // Charger les catégories et produits au chargement de la page
+        window.onload = async () => {
+            await fetchCategories();
+            await fetchProducts();
+        };
+    </script>
+</body>
+</html>

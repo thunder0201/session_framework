@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Ajouter une Catégorie</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Ajouter une Catégorie</h1>
+        <form id="ajouterCategorieForm">
+            <label for="nom">Nom de la catégorie :</label>
+            <input type="text" id="nom" required>
+            <button type="submit">Ajouter</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('ajouterCategorieForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nom = document.getElementById('nom').value;
+    console.log('Nom de la catégorie à ajouter:', nom); // Log pour vérifier le nom
+    try {
+        const response = await fetch('/categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nom })
+        });
+        const data = await response.json();
+        alert(data.message || data.error); // Affiche le message ou l'erreur
+    } catch (error) {
+        console.error('Erreur:', error);
+    }
+});
+
+    </script>
+</body>
+</html>

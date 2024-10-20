@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <h1>Tableau de Bord</h1>
+    <div>
+        <h2>Statistiques</h2>
+        <canvas id="statistiquesChart" width="400" height="200"></canvas>
+    </div>
+
+    <button id="downloadPdfButton">Télécharger la liste des produits en PDF</button>
+
+    <script>
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/dashboard');
+                const data = await response.json();
+
+                // Créer le graphique
+                const ctx = document.getElementById('statistiquesChart').getContext('2d');
+                const statistiquesChart = new Chart(ctx, {
+                    type: 'bar', // Type de graphique : barre
+                    data: {
+                        labels: ['Catégories', 'Produits'],
+                        datasets: [{
+                            label: 'Nombre',
+                            data: [data.categories, data.produits],
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.2)', // Couleur pour les catégories
+                                'rgba(255, 99, 132, 0.2)', // Couleur pour les produits
+                            ],
+                            borderColor: [
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(255, 99, 132, 1)',
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Charger les données du tableau de bord au chargement de la page
+        window.onload = loadDashboard;
+    </script>
+</body>
+</html>
