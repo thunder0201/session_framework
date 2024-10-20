@@ -194,17 +194,44 @@ app.get('/download-products-pdf', async (req, res) => {
 
         // Créer le PDF
         const doc = new jsPDF();
-        doc.setFontSize(12);
-        doc.text("Liste des Produits", 10, 10);
-        doc.text("ID    Nom    Prix    Catégorie ID", 10, 20);
 
-        produits.forEach((produit, index) => {
-            doc.text(`${produit.id}    ${produit.nom}    ${produit.prix}    ${produit.categorie_id}`, 10, 30 + (index * 10));
+        // Définir la police, la taille et la couleur
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.setTextColor(0, 0, 128); // Bleu
+
+        // Centrer le titre
+        doc.text("Liste des Produits", 105, 10, { align: 'center' });
+
+        // Ligne de séparation
+        doc.setLineWidth(0.5);
+        doc.line(10, 15, 200, 15);
+
+        // En-têtes de tableau
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0); // Noir
+        doc.setFont('helvetica', 'bold');
+        const headers = ['ID', 'Nom', 'Prix (€)', 'Catégorie ID'];
+        let startY = 25;
+        headers.forEach((header, index) => {
+            doc.text(header, 20 + (index * 50), startY);
         });
 
-        // Télécharger le PDF
-        doc.save("produits.pdf");
-        res.status(200).send("PDF généré avec succès");
+        // Contenu des produits
+        doc.setFont('helvetica', 'normal');
+        produits.forEach((produit, index) => {
+            const yPosition = startY + 10 + (index * 10);
+            doc.text(`${produit.id}`, 20, yPosition);
+            doc.text(`${produit.nom}`, 70, yPosition);
+            doc.text(`${produit.prix.toFixed(2)} €`, 120, yPosition);
+            doc.text(`${produit.categorie_id}`, 170, yPosition);
+        });
+
+        // Sauvegarder le fichier PDF
+        const pdfData = doc.output();  // Générer le PDF
+        res.setHeader('Content-Disposition', 'attachment; filename="produits.pdf"');
+        res.setHeader('Content-Type', 'application/pdf');
+        res.send(pdfData);  // Envoyer le PDF généré
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ error: 'Erreur lors de la génération du PDF' });

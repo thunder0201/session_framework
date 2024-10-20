@@ -36,8 +36,8 @@
                 // Ajouter les options au select
                 categories.forEach(categorie => {
                     const option = document.createElement('option');
-                    option.value = categorie.id; // Assurez-vous que l'id existe
-                    option.textContent = categorie.nom; // Assurez-vous que le nom existe
+                    option.value = categorie.id; // Assurance que l'id existe
+                    option.textContent = categorie.nom; // Assurance que le nom existe
                     select.appendChild(option);
                 });
             } catch (error) {
